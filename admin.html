@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Portfolio</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #f4f6f9; color: #333; display: flex; min-height: 100vh; }
+        
+        /* Login Screen */
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1f242d; display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: #323946; padding: 3rem; border-radius: 1rem; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 0 20px rgba(0,238,255,0.2); }
+        .login-box h2 { color: #fff; margin-bottom: 2rem; font-size: 2rem; }
+        .login-box input { width: 100%; padding: 1rem; margin-bottom: 1rem; border: none; border-radius: 0.5rem; background: #1f242d; color: #fff; font-size: 1rem; }
+        .login-box button { width: 100%; padding: 1rem; background: #0ef; color: #323946; font-weight: 600; border: none; border-radius: 0.5rem; cursor: pointer; font-size: 1.1rem; transition: 0.3s; }
+        .login-box button:hover { box-shadow: 0 0 1rem #0ef; }
+        #login-error { color: #ff4d4d; margin-top: 1rem; font-size: 0.9rem; display: none; }
+
+        /* Dashboard */
+        #dashboard { display: none; width: 100%; }
+        .sidebar { width: 250px; background: #1f242d; padding: 2rem 1rem; color: #fff; }
+        .sidebar h2 { color: #0ef; margin-bottom: 2rem; text-align: center; }
+        .sidebar ul { list-style: none; }
+        .sidebar ul li { margin-bottom: 1rem; }
+        .sidebar ul li a { color: #fff; text-decoration: none; display: block; padding: 0.8rem 1rem; border-radius: 0.5rem; transition: 0.3s; }
+        .sidebar ul li a:hover, .sidebar ul li a.active { background: #0ef; color: #1f242d; }
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #ddd; }
+        .header h1 { font-size: 1.8rem; }
+        .logout-btn { padding: 0.5rem 1.5rem; background: #ff4d4d; color: #fff; border: none; border-radius: 0.5rem; cursor: pointer; }
+        
+        /* Forms */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 0.5rem; font-size: 1rem; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .save-btn { padding: 0.8rem 2rem; background: #0ef; color: #1f242d; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        .save-btn:hover { box-shadow: 0 0 10px rgba(0, 238, 255, 0.5); }
+        
+        /* Projects List */
+        .project-item { background: #fff; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .project-info h3 { margin-bottom: 0.3rem; }
+        .project-actions button { padding: 0.5rem 1rem; margin-left: 0.5rem; border: none; border-radius: 0.3rem; cursor: pointer; }
+        .btn-delete { background: #ff4d4d; color: #fff; }
+        
+        #toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: #fff; padding: 1rem 2rem; border-radius: 0.5rem; display: none; z-index: 1000; }
+    </style>
+</head>
+<body>
+
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>Admin Login</h2>
+            <form id="login-form">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+                <p id="login-error">Invalid username or password</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard">
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <ul>
+                <li><a href="#" class="active" onclick="showTab('general')">General Info</a></li>
+                <li><a href="#" onclick="showTab('projects')">Projects</a></li>
+                <li><a href="#" onclick="showTab('journey')">Journey (Edu/Exp)</a></li>
+                <li><a href="#" onclick="showTab('skills')">Skills</a></li>
+                <li><a href="/" target="_blank">View Website <i class='bx bx-link-external'></i></a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1 id="tab-title">General Info</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            
+            <!-- General Info Tab -->
+            <div id="tab-general" class="tab-content">
+                <form id="general-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="g-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role / Title</label>
+                        <input type="text" id="g-role" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hero Description</label>
+                        <textarea id="g-desc" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>About Description</label>
+                        <textarea id="g-about" required></textarea>
+                    </div>
+                    <h3>Social Links</h3><br>
+                    <div class="form-group">
+                        <label>Facebook URL</label>
+                        <input type="url" id="g-fb">
+                    </div>
+                    <div class="form-group">
+                        <label>Twitter URL</label>
+                        <input type="url" id="g-tw">
+                    </div>
+                    <div class="form-group">
+                        <label>LinkedIn URL</label>
+                        <input type="url" id="g-li">
+                    </div>
+                    <button type="submit" class="save-btn">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- Projects Tab -->
+            <div id="tab-projects" class="tab-content" style="display: none;">
+                <div style="background: #fff; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                    <h3>Add New Project</h3><br>
+                    <form id="project-form">
+                        <div class="form-group">
+                            <label>Project Title</label>
+                            <input type="text" id="p-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Project Description</label>
+                            <textarea id="p-desc" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Image URL (or Base64)</label>
+                            <input type="text" id="p-img" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Project Link</label>
+                            <input type="url" id="p-link">
+                        </div>
+                        <button type="submit" class="save-btn">Add Project</button>
+                    </form>
+                </div>
+                <h3>Existing Projects</h3><br>
+                <div id="projects-list">
+                    <!-- Projects will be listed here -->
+                </div>
+            </div>
+
+            <!-- Journey Tab -->
+            <div id="tab-journey" class="tab-content" style="display: none;">
+                <p>Manage your education and experience timeline.</p><br>
+                <form id="journey-form">
+                    <div class="form-group">
+                        <label>Education Details (JSON Format)</label>
+                        <textarea id="j-edu" rows="5">[]</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Experience Details (JSON Format)</label>
+                        <textarea id="j-exp" rows="5">[]</textarea>
+                    </div>
+                    <button type="submit" class="save-btn">Save Journey</button>
+                </form>
+            </div>
+
+            <!-- Skills Tab -->
+            <div id="tab-skills" class="tab-content" style="display: none;">
+                <p>Manage your Coding and Professional Skills percentages.</p><br>
+                <form id="skills-form">
+                    <div class="form-group">
+                        <label>Coding Skills (JSON Format: [{"title": "HTML", "percentage": 90}])</label>
+                        <textarea id="s-coding" rows="5">[]</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Professional Skills (JSON Format: [{"title": "Web Design", "percentage": 95}])</label>
+                        <textarea id="s-prof" rows="5">[]</textarea>
+                    </div>
+                    <button type="submit" class="save-btn">Save Skills</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">Saved Successfully!</div>
+    
+    <script type="module" src="/admin.js"></script>
+</body>
+</html>
